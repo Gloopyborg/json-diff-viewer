@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
@@ -131,7 +130,10 @@ const Index = () => {
           drawFileList: false,
         });
       } else {
-        // Fallback to basic diff display
+        // Fallback to basic diff display with debugging info
+        console.log('Diff2Html fallback triggered:');
+        console.log('window.Diff2Html:', window.Diff2Html);
+        console.log('window.Diff2Html.html:', window.Diff2Html?.html);
         outputHtml = `<pre style="text-align: left; background: #f5f5f5; padding: 1rem; border-radius: 0.5rem; overflow-x: auto;">${diff}</pre>`;
       }
 
