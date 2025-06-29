@@ -48,7 +48,7 @@ const Index = () => {
         
         // Load diff2html after jsdiff
         const diff2htmlScript = document.createElement('script');
-        diff2htmlScript.src = 'https://cdn.jsdelivr.net/npm/diff2html/bundles/js/diff2html-ui.min.js';
+        diff2htmlScript.src = 'https://cdn.jsdelivr.net/npm/diff2html/bundles/js/diff2html.min.js';
         diff2htmlScript.onload = () => {
           console.log('diff2html loaded');
           setScriptsLoaded(true);
