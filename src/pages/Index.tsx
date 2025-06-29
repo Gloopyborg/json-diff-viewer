@@ -2,8 +2,15 @@ import React, { useState, useEffect } from 'react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { AlertCircle, FileText, GitCompare } from "lucide-react";
+import { AlertCircle, FileText, GitCompare, Search } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Input } from "@/components/ui/input";
+import { 
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 declare global {
   interface Window {
@@ -21,6 +28,10 @@ const Index = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>('');
   const [scriptsLoaded, setScriptsLoaded] = useState<boolean>(false);
+  const [file1Search, setFile1Search] = useState<string>('');
+  const [file2Search, setFile2Search] = useState<string>('');
+  const [file1DropdownOpen, setFile1DropdownOpen] = useState<boolean>(false);
+  const [file2DropdownOpen, setFile2DropdownOpen] = useState<boolean>(false);
 
   // Sample JSON file URLs - in a real app, these would come from your server
   const availableFiles = [
@@ -264,6 +275,19 @@ const Index = () => {
     { value: 'https://raw.githubusercontent.com/alexmi256/SlicerPrintProfiles/refs/heads/main/system/BBL/process/combined_fdm_process_single_common.json', label: 'combined_fdm_process_single_common.json' },
   ];
 
+  const filteredFile1Options = availableFiles.filter(file =>
+    file.label.toLowerCase().includes(file1Search.toLowerCase())
+  );
+
+  const filteredFile2Options = availableFiles.filter(file =>
+    file.label.toLowerCase().includes(file2Search.toLowerCase())
+  );
+
+  const getSelectedFileLabel = (url: string) => {
+    const file = availableFiles.find(f => f.value === url);
+    return file ? file.label : 'Select file...';
+  };
+
   useEffect(() => {
     const loadExternalScripts = () => {
       // Load diff2html CSS
@@ -434,18 +458,37 @@ const Index = () => {
             <div className="grid md:grid-cols-2 gap-6">
               <div className="space-y-2">
                 <label className="text-sm font-medium text-gray-700">First JSON File</label>
-                <Select value={file1Url} onValueChange={setFile1Url}>
-                  <SelectTrigger className="w-full">
-                    <SelectValue placeholder="Select first JSON file..." />
-                  </SelectTrigger>
-                  <SelectContent className="bg-white z-50">
-                    {availableFiles.map((file) => (
-                      <SelectItem key={file.value} value={file.value}>
-                        {file.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <DropdownMenu open={file1DropdownOpen} onOpenChange={setFile1DropdownOpen}>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="outline" className="w-full justify-between">
+                      <span className="truncate">{getSelectedFileLabel(file1Url)}</span>
+                      <Search className="ml-2 h-4 w-4 shrink-0" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent className="w-full bg-white p-2 max-h-80 overflow-y-auto z-50">
+                    <Input
+                      placeholder="Search files..."
+                      value={file1Search}
+                      onChange={(e) => setFile1Search(e.target.value)}
+                      className="mb-2"
+                    />
+                    <div className="max-h-64 overflow-y-auto">
+                      {filteredFile1Options.map((file) => (
+                        <DropdownMenuItem
+                          key={file.value}
+                          onClick={() => {
+                            setFile1Url(file.value);
+                            setFile1DropdownOpen(false);
+                            setFile1Search('');
+                          }}
+                          className="cursor-pointer"
+                        >
+                          {file.label}
+                        </DropdownMenuItem>
+                      ))}
+                    </div>
+                  </DropdownMenuContent>
+                </DropdownMenu>
                 {file1Content && (
                   <p className="text-sm text-green-600">✓ File loaded ({file1Content.split('\n').length} lines)</p>
                 )}
@@ -453,18 +496,37 @@ const Index = () => {
 
               <div className="space-y-2">
                 <label className="text-sm font-medium text-gray-700">Second JSON File</label>
-                <Select value={file2Url} onValueChange={setFile2Url}>
-                  <SelectTrigger className="w-full">
-                    <SelectValue placeholder="Select second JSON file..." />
-                  </SelectTrigger>
-                  <SelectContent className="bg-white z-50">
-                    {availableFiles.map((file) => (
-                      <SelectItem key={file.value} value={file.value}>
-                        {file.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <DropdownMenu open={file2DropdownOpen} onOpenChange={setFile2DropdownOpen}>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="outline" className="w-full justify-between">
+                      <span className="truncate">{getSelectedFileLabel(file2Url)}</span>
+                      <Search className="ml-2 h-4 w-4 shrink-0" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent className="w-full bg-white p-2 max-h-80 overflow-y-auto z-50">
+                    <Input
+                      placeholder="Search files..."
+                      value={file2Search}
+                      onChange={(e) => setFile2Search(e.target.value)}
+                      className="mb-2"
+                    />
+                    <div className="max-h-64 overflow-y-auto">
+                      {filteredFile2Options.map((file) => (
+                        <DropdownMenuItem
+                          key={file.value}
+                          onClick={() => {
+                            setFile2Url(file.value);
+                            setFile2DropdownOpen(false);
+                            setFile2Search('');
+                          }}
+                          className="cursor-pointer"
+                        >
+                          {file.label}
+                        </DropdownMenuItem>
+                      ))}
+                    </div>
+                  </DropdownMenuContent>
+                </DropdownMenu>
                 {file2Content && (
                   <p className="text-sm text-green-600">✓ File loaded ({file2Content.split('\n').length} lines)</p>
                 )}
