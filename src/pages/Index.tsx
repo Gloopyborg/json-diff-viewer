@@ -11,6 +11,8 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Label } from "@/components/ui/label";
 
 declare global {
   interface Window {
@@ -32,6 +34,7 @@ const Index = () => {
   const [file2Search, setFile2Search] = useState<string>('');
   const [file1DropdownOpen, setFile1DropdownOpen] = useState<boolean>(false);
   const [file2DropdownOpen, setFile2DropdownOpen] = useState<boolean>(false);
+  const [fileTypeFilter, setFileTypeFilter] = useState<string>('machine');
 
   // Sample JSON file URLs - in a real app, these would come from your server
   const availableFiles = [
@@ -275,11 +278,18 @@ const Index = () => {
     { value: 'https://raw.githubusercontent.com/alexmi256/SlicerPrintProfiles/refs/heads/main/system/BBL/process/combined_fdm_process_single_common.json', label: 'combined_fdm_process_single_common.json' },
   ];
 
-  const filteredFile1Options = availableFiles.filter(file =>
+  // Filter files based on file type filter first, then search
+  const getFilteredFiles = () => {
+    return availableFiles.filter(file => 
+      file.value.toLowerCase().includes(fileTypeFilter)
+    );
+  };
+
+  const filteredFile1Options = getFilteredFiles().filter(file =>
     file.label.toLowerCase().includes(file1Search.toLowerCase())
   );
 
-  const filteredFile2Options = availableFiles.filter(file =>
+  const filteredFile2Options = getFilteredFiles().filter(file =>
     file.label.toLowerCase().includes(file2Search.toLowerCase())
   );
 
@@ -443,6 +453,31 @@ const Index = () => {
           </div>
           <p className="text-xl text-gray-600">Compare JSON files side by side with visual differences</p>
         </div>
+
+        <Card className="mb-6">
+          <CardHeader>
+            <CardTitle>File Type Filter</CardTitle>
+            <CardDescription>
+              Filter available files by type before selecting
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <RadioGroup value={fileTypeFilter} onValueChange={setFileTypeFilter} className="flex gap-6">
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="machine" id="machine" />
+                <Label htmlFor="machine">Machine</Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="process" id="process" />
+                <Label htmlFor="process">Process</Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="filament" id="filament" />
+                <Label htmlFor="filament">Filament</Label>
+              </div>
+            </RadioGroup>
+          </CardContent>
+        </Card>
 
         <Card className="mb-6">
           <CardHeader>
